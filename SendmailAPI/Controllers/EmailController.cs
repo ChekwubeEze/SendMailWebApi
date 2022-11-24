@@ -9,16 +9,16 @@ namespace SendmailAPI.Controllers
     [ApiController]
     public class EmailController : ControllerBase
     {
-        private readonly IMailServices _mailServices;
+        private readonly ITestClass _testClass;
 
-        public EmailController(IMailServices mailServices)
+        public EmailController(ITestClass testClass)
         {
-            _mailServices = mailServices;
+            _testClass = testClass;
         }
         [HttpPost("Send mail")]
         public IActionResult Sendmail([FromQuery]EmailReceiver emailReceiver)
         {
-            _mailServices.SendEmail(emailReceiver);
+            _testClass.Sending(emailReceiver);
             return Ok();
         }
     }

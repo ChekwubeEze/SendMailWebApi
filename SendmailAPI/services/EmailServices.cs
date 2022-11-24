@@ -9,22 +9,22 @@ namespace SendmailAPI.services
 {
     public class EmailServices : IMailServices
     {
-        private readonly IConfiguration _configuration;
+        private readonly Appsetting _appsetting;
 
-        public EmailServices(IConfiguration configuration)
+        public EmailServices(IServiceProvider provider)
         {
-            _configuration = configuration;
+            _appsetting = provider.GetRequiredService<Appsetting>();
         }
         public void SendEmail(EmailReceiver emailReceiver)
         {
             var email = new MimeMessage();
-            email.From.Add(MailboxAddress.Parse("agnes.pouros@ethereal.email"));
+            email.From.Add(MailboxAddress.Parse(_appsetting.EmailUserName));
             email.To.Add(MailboxAddress.Parse(emailReceiver.To));
             email.Subject = emailReceiver.Subject;
             email.Body = new TextPart(TextFormat.Plain) { Text = emailReceiver.Body};
             using var smtp = new SmtpClient();
-            smtp.Connect(_configuration.GetSection("EmailHost").Value, 587, SecureSocketOptions.StartTls);
-            smtp.Authenticate(_configuration.GetSection("EmailUserName").Value, _configuration.GetSection("EmailPassword").Value);
+            smtp.Connect(_appsetting.EmailHost, _appsetting.Port, SecureSocketOptions.StartTls);
+            smtp.Authenticate(_appsetting.EmailUserName, _appsetting.EmailPassword);
             smtp.Send(email);
             smtp.Disconnect(true);
         }
